@@ -1,0 +1,14 @@
+syntax="proto3";
+
+// option go_package="sami/rt0805/client/device_grpc";
+option go_package="sami/rt0805/server/device_grpc";
+
+message Request {
+    
+}
+
+message Response {}
+
+service DeviceService {
+    rpc CreateDevice (Request) returns (Response);
+} 
