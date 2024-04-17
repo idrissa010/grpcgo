@@ -19,3 +19,11 @@ services:
       - ME_CONFIG_MONGODB_URL=mongodb://root:root@db:27017/
     depends_on:
       - db
+
+  server:
+    build: ./server
+    container_name: server
+    ports:
+      - "50051:50051"
+    depends_on:
+      - db
