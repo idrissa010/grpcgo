@@ -73,6 +73,7 @@ func main() {
 			// Convertir les opérations en []*device_grpc.Operation
 			var operations []*pb.Operation
 			for _, op := range device.Operations {
+
 				var opType pb.Operation_OperationType
 				switch op.Type {
 				case "CREATE":
@@ -84,13 +85,19 @@ func main() {
 				default:
 					log.Fatalf("Type d'opération invalide : %s", op.Type)
 				}
+				device.NumOperation++
+				if !op.HasSucceeded {
+					device.NumError++
+				}
 
 				operations = append(operations, &pb.Operation{
 					Type:         opType,
 					HasSucceeded: op.HasSucceeded,
 				})
 			}
-
+			fmt.Println("Nombre d'operation :", device.NumOperation)
+			fmt.Println("Nombre d'erreur :", device.NumError)
+			fmt.Println("")
 			// Envoyer chaque DeviceData au serveur
 			err = stream.Send(&pb.DeviceData{
 				DeviceName:    device.DeviceName,
