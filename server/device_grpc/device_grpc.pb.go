@@ -22,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DeviceServiceClient interface {
-	CreateDevice(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+	SendDeviceData(ctx context.Context, opts ...grpc.CallOption) (DeviceService_SendDeviceDataClient, error)
 }
 
 type deviceServiceClient struct {
@@ -33,20 +33,45 @@ func NewDeviceServiceClient(cc grpc.ClientConnInterface) DeviceServiceClient {
 	return &deviceServiceClient{cc}
 }
 
-func (c *deviceServiceClient) CreateDevice(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
-	out := new(Response)
-	err := c.cc.Invoke(ctx, "/DeviceService/CreateDevice", in, out, opts...)
+func (c *deviceServiceClient) SendDeviceData(ctx context.Context, opts ...grpc.CallOption) (DeviceService_SendDeviceDataClient, error) {
+	stream, err := c.cc.NewStream(ctx, &DeviceService_ServiceDesc.Streams[0], "/DeviceService/SendDeviceData", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &deviceServiceSendDeviceDataClient{stream}
+	return x, nil
+}
+
+type DeviceService_SendDeviceDataClient interface {
+	Send(*DeviceData) error
+	CloseAndRecv() (*SendResponse, error)
+	grpc.ClientStream
+}
+
+type deviceServiceSendDeviceDataClient struct {
+	grpc.ClientStream
+}
+
+func (x *deviceServiceSendDeviceDataClient) Send(m *DeviceData) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *deviceServiceSendDeviceDataClient) CloseAndRecv() (*SendResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(SendResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // DeviceServiceServer is the server API for DeviceService service.
 // All implementations must embed UnimplementedDeviceServiceServer
 // for forward compatibility
 type DeviceServiceServer interface {
-	CreateDevice(context.Context, *Request) (*Response, error)
+	SendDeviceData(DeviceService_SendDeviceDataServer) error
 	mustEmbedUnimplementedDeviceServiceServer()
 }
 
@@ -54,8 +79,8 @@ type DeviceServiceServer interface {
 type UnimplementedDeviceServiceServer struct {
 }
 
-func (UnimplementedDeviceServiceServer) CreateDevice(context.Context, *Request) (*Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateDevice not implemented")
+func (UnimplementedDeviceServiceServer) SendDeviceData(DeviceService_SendDeviceDataServer) error {
+	return status.Errorf(codes.Unimplemented, "method SendDeviceData not implemented")
 }
 func (UnimplementedDeviceServiceServer) mustEmbedUnimplementedDeviceServiceServer() {}
 
@@ -70,22 +95,30 @@ func RegisterDeviceServiceServer(s grpc.ServiceRegistrar, srv DeviceServiceServe
 	s.RegisterService(&DeviceService_ServiceDesc, srv)
 }
 
-func _DeviceService_CreateDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
-	if err := dec(in); err != nil {
+func _DeviceService_SendDeviceData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(DeviceServiceServer).SendDeviceData(&deviceServiceSendDeviceDataServer{stream})
+}
+
+type DeviceService_SendDeviceDataServer interface {
+	SendAndClose(*SendResponse) error
+	Recv() (*DeviceData, error)
+	grpc.ServerStream
+}
+
+type deviceServiceSendDeviceDataServer struct {
+	grpc.ServerStream
+}
+
+func (x *deviceServiceSendDeviceDataServer) SendAndClose(m *SendResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *deviceServiceSendDeviceDataServer) Recv() (*DeviceData, error) {
+	m := new(DeviceData)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(DeviceServiceServer).CreateDevice(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/DeviceService/CreateDevice",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DeviceServiceServer).CreateDevice(ctx, req.(*Request))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 // DeviceService_ServiceDesc is the grpc.ServiceDesc for DeviceService service.
@@ -94,12 +127,13 @@ func _DeviceService_CreateDevice_Handler(srv interface{}, ctx context.Context, d
 var DeviceService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "DeviceService",
 	HandlerType: (*DeviceServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "CreateDevice",
-			Handler:    _DeviceService_CreateDevice_Handler,
+			StreamName:    "SendDeviceData",
+			Handler:       _DeviceService_SendDeviceData_Handler,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "device.proto",
 }

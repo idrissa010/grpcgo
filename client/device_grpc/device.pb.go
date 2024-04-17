@@ -20,14 +20,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Request struct {
+type Operation_OperationType int32
+
+const (
+	Operation_CREATE Operation_OperationType = 0
+	Operation_UPDATE Operation_OperationType = 1
+	Operation_DELETE Operation_OperationType = 2
+)
+
+// Enum value maps for Operation_OperationType.
+var (
+	Operation_OperationType_name = map[int32]string{
+		0: "CREATE",
+		1: "UPDATE",
+		2: "DELETE",
+	}
+	Operation_OperationType_value = map[string]int32{
+		"CREATE": 0,
+		"UPDATE": 1,
+		"DELETE": 2,
+	}
+)
+
+func (x Operation_OperationType) Enum() *Operation_OperationType {
+	p := new(Operation_OperationType)
+	*p = x
+	return p
+}
+
+func (x Operation_OperationType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Operation_OperationType) Descriptor() protoreflect.EnumDescriptor {
+	return file_device_proto_enumTypes[0].Descriptor()
+}
+
+func (Operation_OperationType) Type() protoreflect.EnumType {
+	return &file_device_proto_enumTypes[0]
+}
+
+func (x Operation_OperationType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Operation_OperationType.Descriptor instead.
+func (Operation_OperationType) EnumDescriptor() ([]byte, []int) {
+	return file_device_proto_rawDescGZIP(), []int{0, 0}
+}
+
+type Operation struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Type         Operation_OperationType `protobuf:"varint,1,opt,name=type,proto3,enum=Operation_OperationType" json:"type,omitempty"`
+	HasSucceeded bool                    `protobuf:"varint,2,opt,name=has_succeeded,json=hasSucceeded,proto3" json:"has_succeeded,omitempty"`
 }
 
-func (x *Request) Reset() {
-	*x = Request{}
+func (x *Operation) Reset() {
+	*x = Operation{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_device_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -35,13 +87,13 @@ func (x *Request) Reset() {
 	}
 }
 
-func (x *Request) String() string {
+func (x *Operation) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Request) ProtoMessage() {}
+func (*Operation) ProtoMessage() {}
 
-func (x *Request) ProtoReflect() protoreflect.Message {
+func (x *Operation) ProtoReflect() protoreflect.Message {
 	mi := &file_device_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -53,19 +105,38 @@ func (x *Request) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Request.ProtoReflect.Descriptor instead.
-func (*Request) Descriptor() ([]byte, []int) {
+// Deprecated: Use Operation.ProtoReflect.Descriptor instead.
+func (*Operation) Descriptor() ([]byte, []int) {
 	return file_device_proto_rawDescGZIP(), []int{0}
 }
 
-type Response struct {
+func (x *Operation) GetType() Operation_OperationType {
+	if x != nil {
+		return x.Type
+	}
+	return Operation_CREATE
+}
+
+func (x *Operation) GetHasSucceeded() bool {
+	if x != nil {
+		return x.HasSucceeded
+	}
+	return false
+}
+
+type DeviceData struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	DeviceName    string       `protobuf:"bytes,1,opt,name=device_name,json=deviceName,proto3" json:"device_name,omitempty"`
+	Operations    []*Operation `protobuf:"bytes,2,rep,name=operations,proto3" json:"operations,omitempty"`
+	NumOperations int32        `protobuf:"varint,3,opt,name=num_operations,json=numOperations,proto3" json:"num_operations,omitempty"`
+	NumErrors     int32        `protobuf:"varint,4,opt,name=num_errors,json=numErrors,proto3" json:"num_errors,omitempty"`
 }
 
-func (x *Response) Reset() {
-	*x = Response{}
+func (x *DeviceData) Reset() {
+	*x = DeviceData{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_device_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -73,13 +144,13 @@ func (x *Response) Reset() {
 	}
 }
 
-func (x *Response) String() string {
+func (x *DeviceData) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Response) ProtoMessage() {}
+func (*DeviceData) ProtoMessage() {}
 
-func (x *Response) ProtoReflect() protoreflect.Message {
+func (x *DeviceData) ProtoReflect() protoreflect.Message {
 	mi := &file_device_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -91,23 +162,119 @@ func (x *Response) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Response.ProtoReflect.Descriptor instead.
-func (*Response) Descriptor() ([]byte, []int) {
+// Deprecated: Use DeviceData.ProtoReflect.Descriptor instead.
+func (*DeviceData) Descriptor() ([]byte, []int) {
 	return file_device_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *DeviceData) GetDeviceName() string {
+	if x != nil {
+		return x.DeviceName
+	}
+	return ""
+}
+
+func (x *DeviceData) GetOperations() []*Operation {
+	if x != nil {
+		return x.Operations
+	}
+	return nil
+}
+
+func (x *DeviceData) GetNumOperations() int32 {
+	if x != nil {
+		return x.NumOperations
+	}
+	return 0
+}
+
+func (x *DeviceData) GetNumErrors() int32 {
+	if x != nil {
+		return x.NumErrors
+	}
+	return 0
+}
+
+type SendResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+}
+
+func (x *SendResponse) Reset() {
+	*x = SendResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_device_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SendResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SendResponse) ProtoMessage() {}
+
+func (x *SendResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_device_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SendResponse.ProtoReflect.Descriptor instead.
+func (*SendResponse) Descriptor() ([]byte, []int) {
+	return file_device_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SendResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
 }
 
 var File_device_proto protoreflect.FileDescriptor
 
 var file_device_proto_rawDesc = []byte{
-	0x0a, 0x0c, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x09,
-	0x0a, 0x07, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x0a, 0x0a, 0x08, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0x34, 0x0a, 0x0d, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x23, 0x0a, 0x0c, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x12, 0x08, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x1a, 0x09, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x20, 0x5a, 0x1e, 0x73,
-	0x61, 0x6d, 0x69, 0x2f, 0x72, 0x74, 0x30, 0x38, 0x30, 0x35, 0x2f, 0x63, 0x6c, 0x69, 0x65, 0x6e,
-	0x74, 0x2f, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x67, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x0a, 0x0c, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x93,
+	0x01, 0x0a, 0x09, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x2c, 0x0a, 0x04,
+	0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x18, 0x2e, 0x4f, 0x70, 0x65,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x68, 0x61,
+	0x73, 0x5f, 0x73, 0x75, 0x63, 0x63, 0x65, 0x65, 0x64, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x0c, 0x68, 0x61, 0x73, 0x53, 0x75, 0x63, 0x63, 0x65, 0x65, 0x64, 0x65, 0x64, 0x22,
+	0x33, 0x0a, 0x0d, 0x4f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65,
+	0x12, 0x0a, 0x0a, 0x06, 0x43, 0x52, 0x45, 0x41, 0x54, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06,
+	0x55, 0x50, 0x44, 0x41, 0x54, 0x45, 0x10, 0x01, 0x12, 0x0a, 0x0a, 0x06, 0x44, 0x45, 0x4c, 0x45,
+	0x54, 0x45, 0x10, 0x02, 0x22, 0x9f, 0x01, 0x0a, 0x0a, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x44,
+	0x61, 0x74, 0x61, 0x12, 0x1f, 0x0a, 0x0b, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x4e, 0x61, 0x6d, 0x65, 0x12, 0x2a, 0x0a, 0x0a, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x4f, 0x70, 0x65, 0x72, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x0a, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x12, 0x25, 0x0a, 0x0e, 0x6e, 0x75, 0x6d, 0x5f, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0d, 0x6e, 0x75, 0x6d, 0x4f, 0x70, 0x65,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x1d, 0x0a, 0x0a, 0x6e, 0x75, 0x6d, 0x5f, 0x65,
+	0x72, 0x72, 0x6f, 0x72, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x6e, 0x75, 0x6d,
+	0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x22, 0x28, 0x0a, 0x0c, 0x53, 0x65, 0x6e, 0x64, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x32, 0x41, 0x0a, 0x0d, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x12, 0x30, 0x0a, 0x0e, 0x53, 0x65, 0x6e, 0x64, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x44,
+	0x61, 0x74, 0x61, 0x12, 0x0b, 0x2e, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x44, 0x61, 0x74, 0x61,
+	0x1a, 0x0d, 0x2e, 0x53, 0x65, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x28, 0x01, 0x42, 0x20, 0x5a, 0x1e, 0x73, 0x61, 0x6d, 0x69, 0x2f, 0x72, 0x74, 0x30, 0x38,
+	0x30, 0x35, 0x2f, 0x63, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x2f, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65,
+	0x5f, 0x67, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -122,19 +289,24 @@ func file_device_proto_rawDescGZIP() []byte {
 	return file_device_proto_rawDescData
 }
 
-var file_device_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_device_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_device_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_device_proto_goTypes = []interface{}{
-	(*Request)(nil),  // 0: Request
-	(*Response)(nil), // 1: Response
+	(Operation_OperationType)(0), // 0: Operation.OperationType
+	(*Operation)(nil),            // 1: Operation
+	(*DeviceData)(nil),           // 2: DeviceData
+	(*SendResponse)(nil),         // 3: SendResponse
 }
 var file_device_proto_depIdxs = []int32{
-	0, // 0: DeviceService.CreateDevice:input_type -> Request
-	1, // 1: DeviceService.CreateDevice:output_type -> Response
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: Operation.type:type_name -> Operation.OperationType
+	1, // 1: DeviceData.operations:type_name -> Operation
+	2, // 2: DeviceService.SendDeviceData:input_type -> DeviceData
+	3, // 3: DeviceService.SendDeviceData:output_type -> SendResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_device_proto_init() }
@@ -144,7 +316,7 @@ func file_device_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_device_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Request); i {
+			switch v := v.(*Operation); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -156,7 +328,19 @@ func file_device_proto_init() {
 			}
 		}
 		file_device_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Response); i {
+			switch v := v.(*DeviceData); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_device_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SendResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -173,13 +357,14 @@ func file_device_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_device_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_device_proto_goTypes,
 		DependencyIndexes: file_device_proto_depIdxs,
+		EnumInfos:         file_device_proto_enumTypes,
 		MessageInfos:      file_device_proto_msgTypes,
 	}.Build()
 	File_device_proto = out.File
