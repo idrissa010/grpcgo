@@ -5,7 +5,7 @@ FROM golang:latest
 WORKDIR /go/src/app
 
 # Copier les fichiers Go dans le conteneur
-COPY ./server .
+COPY . .
 
 # Construire l'exécutable du serveur
 RUN go build -o server server.go
