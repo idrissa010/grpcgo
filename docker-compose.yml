@@ -27,3 +27,10 @@ services:
       - "50051:50051"
     depends_on:
       - db
+  client:
+    build: ./client
+    container_name: client
+    ports:
+      - "50052:50052"
+    depends_on:
+      - db
